@@ -11,3 +11,24 @@ Content-Type: application/json
 ###
 
 GET http://localhost:8080/users
+
+###
+
+GET http://localhost:8080/user/1
+
+###
+GET http://localhost:8080/user/delete/hakixer@gmail.com
+
+###
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "email": "hakixer@gmail.com",
+    "password": "hakisolos"
+}
+
+###
+
+GET http://localhost:8080/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imhha2l4ZXJAZ21haWwuY29tIiwiZXhwIjoxNzc1MTYyNDE4fQ.6MY8OH3GwL-jBJ1fefFhHcv8y_qXyIrBbhp7b7GlNyI
