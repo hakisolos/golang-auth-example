@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SparkDB API Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        header {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px 12px;
+            transition: background-color 0.3s;
+        }
+
+        nav button:hover {
+            background-color: #333;
+            border-radius: 4px;
+        }
+
+        nav button.active {
+            background-color: #555;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            padding: 10px;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border: 2px solid #000000;
+        }
+
+        button.btn {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button.btn:hover {
+            background-color: #333;
+        }
+
+        .response {
+            background-color: #f5f5f5;
+            border: 1px solid #000000;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            border-left: 4px solid #000000;
+            background-color: #efefef;
+        }
+
+        .error {
+            border-left: 4px solid #000000;
+            background-color: #fff0f0;
+            color: #000000;
+        }
+
+        .user-card {
+            border: 1px solid #000000;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .user-card p {
+            margin: 8px 0;
+        }
+
+        .user-card strong {
+            display: inline-block;
+            width: 100px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SparkDB API</h1>
+        <nav>
+            <button onclick="navigateTo('home')" class="nav-link active" data-page="home">Home</button>
+            <button onclick="navigateTo('signup')" class="nav-link" data-page="signup">Sign Up</button>
+            <button onclick="navigateTo('login')" class="nav-link" data-page="login">Login</button>
+            <button onclick="navigateTo('users')" class="nav-link" data-page="users">Users</button>
+            <button onclick="navigateTo('profile')" class="nav-link" data-page="profile">Profile</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div id="home" class="page active">
+            <h2>Welcome to SparkDB API</h2>
+            <p>This is a dummy frontend for the SparkDB Mock Server API.</p>
+            <p>Use the navigation buttons above to:</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Sign up a new user</li>
+                <li>Log in to your account</li>
+                <li>View all users</li>
+                <li>Access your profile (requires login)</li>
+            </ul>
+            <p style="margin-top: 20px; color: #666;">Backend running on port 8080</p>
+        </div>
+
+        <div id="signup" class="page">
+            <h2>Sign Up</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="signup-username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="signup-email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="signup-password" placeholder="Enter password">
+            </div>
+            <button class="btn" onclick="handleSignup()">Sign Up</button>
+            <div id="signup-response"></div>
+        </div>
+
+        <div id="login" class="page">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Enter password">
+            </div>
+            <button class="btn" onclick="handleLogin()">Login</button>
+            <div id="login-response"></div>
+        </div>
+
+        <div id="users" class="page">
+            <h2>All Users</h2>
+            <button class="btn" onclick="fetchUsers()">Fetch Users</button>
+            <div id="users-response"></div>
+        </div>
+
+        <div id="profile" class="page">
+            <h2>Your Profile</h2>
+            <button class="btn" onclick="fetchProfile()">Fetch Profile</button>
+            <div id="profile-response"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+            document.getElementById(page).classList.add('active');
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+        }
+
+        async function handleSignup() {
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (!username || !email || !password) {
+                showResponse('signup-response', 'Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const data = await response.json();
+                showResponse('signup-response', JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+                if (response.ok) {
+                    document.getElementById('signup-username').value = '';
+                    document.getElementById('signup-email').value = '';
+                    document.getElementById('signup-password').value = '';
+                }
+            } catch (error) {
+                showResponse('signup-response', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showResponse('login-response', 'Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (response.ok && data.data) {
+                    localStorage.setItem('token', data.data);
+                    showResponse('login-response', `Login successful!\nToken saved.`, 'success');
+                    document.getElementById('login-email').value = '';
+                    document.getElementById('login-password').value = '';
+                } else {
+                    showResponse('login-response', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                showResponse('login-response', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchUsers() {
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                const users = await response.json();
+                
+                let html = '';
+                if (Array.isArray(users)) {
+                    users.forEach(user => {
+                        html += `<div class="user-card">
+                            <p><strong>ID:</strong> ${user.id}</p>
+                            <p><strong>Username:</strong> ${user.username}</p>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                        </div>`;
+                    });
+                } else {
+                    html = JSON.stringify(users, null, 2);
+                }
+                
+                document.getElementById('users-response').innerHTML = html;
+            } catch (error) {
+                showResponse('users-response', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function fetchProfile() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                showResponse('profile-response', 'No token found. Please login first.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                showResponse('profile-response', JSON.stringify(data, null, 2), response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResponse('profile-response', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showResponse(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = `response ${type}`;
+            element.textContent = message;
+        }
+    </script>
+</body>
+</html>

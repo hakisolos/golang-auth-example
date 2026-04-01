@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=mysecretkeyjfni3u4fu32h94uh29384h93uh498u3h943h
+    env_file:
+      - .env
+    container_name: sparkdb-backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sparkdb-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    container_name: sparkdb-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - FLASK_ENV=production
+    networks:
+      - sparkdb-network
+
+networks:
+  sparkdb-network:
+    driver: bridge
